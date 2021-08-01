@@ -2,16 +2,16 @@
 import React from 'react';
 
 function ActionBar(props) {
-    const {goToPreviousFn, goToNextFn, deleteEmployeeFn} = props;
+    const {goToPreviousFn, goToNextFn, deleteEmployeeFn, toggleFormFn, toggleEditingFn, editing} = props;
     return (
         <div className="action-bar">
             <div className="prev-btn">
                 <button className='nav-btn'onClick={goToPreviousFn}>{'< Previous'}</button>
             </div>
             <div className="action-btns">
-                <button>Edit</button>
+                <button onClick={toggleEditingFn}>{editing ? 'Save' : 'Edit'}</button>
                 <button onClick={deleteEmployeeFn}>Delete</button>
-                <button>New</button>
+                <button onClick={toggleFormFn}>New</button>
             </div>
             <div className='next-btn'>
                 <button className='nav-btn' onClick={goToNextFn}>{'Next >'}</button>

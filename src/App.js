@@ -3,22 +3,28 @@ import './App.css';
 import InfoCard from './InfoCard';
 import ActionBar from './ActionBar';
 import data from './data';
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
+
+const initialState = {
+  name: {first: '', last: ''},
+  city: '',
+  country: '',
+  title: '',
+  employer: '',
+  favoriteMovies: []
+}
 
 function App() {
   const [employeeArray, setEmployeeArray] = useState([...data]);
   const [employeeIndex, setEmployeeIndex] = useState(0);
   const [employee, setEmployee]= useState(employeeArray[employeeIndex]);
-  const [newEmployee, setNewEmployee] = useState({
-    name: {first: '', last: ''},
-    city: '',
-    country: '',
-    title: '',
-    employer: '',
-    favoriteMovies: []
-  });
+  const [isActive, setIsActive] = useState(false);
+  const [newEmployee, setNewEmployee] = useState(initialState);
+  const [editing, setEditing] = useState(false);
 
-  useEffect(() => {setEmployee(employeeArray[employeeIndex])} , [employeeArray, employeeIndex]);
+  const toggleClass = () => {
+    setIsActive(!isActive);
+  };
 
   function goToPrevious() {
     if (employeeIndex > 0) {
@@ -38,17 +44,67 @@ function App() {
   }
 
   function deleteEmployee() {
-    setEmployeeArray(employeeArray.splice(employeeIndex, 1));
-    setEmployeeIndex(employeeIndex - 1);
+    employeeArray.splice(employeeIndex, 1)
+    setEmployeeArray(employeeArray);
+    setEmployee(employeeArray[employeeIndex]);
   }
 
   function addEmployee(e) {
     e.preventDefault();
+    employeeArray.push(newEmployee)
     console.log(newEmployee);
-    setEmployeeArray(...employeeArray, employeeArray.push(newEmployee));
+    setEmployeeArray(employeeArray);
     console.log(employeeArray);
     setEmployee(employeeArray[employeeArray.length - 1]);
+    setNewEmployee(initialState);
   }
+
+  function toggleEditing() {
+    setEditing(!editing);
+  }
+
+  function editFirstName(e) {
+    const editedEmployee = {...employee};
+    editedEmployee.name.first = e.target.value;
+    setEmployee(editedEmployee);
+  }
+
+  function editLastName(e) {
+    const editedEmployee = {...employee};
+    editedEmployee.name.last = e.target.value;
+    setEmployee(editedEmployee);
+  }
+
+  function editCity(e) {
+    const editedEmployee = {...employee};
+    editedEmployee.city = e.target.value;
+    setEmployee(editedEmployee);
+  }
+
+  function editCountry(e) {
+    const editedEmployee = {...employee};
+    editedEmployee.country = e.target.value;
+    setEmployee(editedEmployee);
+  }
+
+  function editTitle(e) {
+    const editedEmployee = {...employee};
+    editedEmployee.title = e.target.value;
+    setEmployee(editedEmployee);
+  }
+
+  function editEmployer(e) {
+    const editedEmployee = {...employee};
+    editedEmployee.employer = e.target.value;
+    setEmployee(editedEmployee);
+  }
+
+  function editFavoriteMovies(e) {
+    const editedEmployee = {...employee};
+    editedEmployee.favoriteMovies = e.target.value.split(',');
+    setEmployee(editedEmployee);
+  }
+
 
   return (
     <div className="App">
@@ -61,19 +117,30 @@ function App() {
             employeeIndex={employeeIndex}
             employee={employee}
             employeeArray={employeeArray}
+            editing={editing}
+            editFirstName={editFirstName}
+            editLastName={editLastName}
+            editCity={editCity}
+            editCountry={editCountry}
+            editTitle={editTitle}
+            editEmployer={editEmployer}
+            editFavoriteMovies={editFavoriteMovies}
           />
           <ActionBar 
             goToPreviousFn={goToPrevious}
             goToNextFn={goToNext}
             deleteEmployeeFn={deleteEmployee}
+            toggleFormFn={toggleClass}
+            toggleEditingFn={toggleEditing}
+            editing={editing}
           />
-          <form className='newEmployeeForm' onSubmit={(e)=> addEmployee(e)}>
+          <form className={isActive ? 'newEmployeeForm' : 'hidden'} onSubmit={(e)=> addEmployee(e)}>
             <label>First Name:
               <input 
                 type='text' 
                 placeholder='First Name' 
                 value={newEmployee.name.first} 
-                onChange={(e)=> setNewEmployee({...newEmployee, name:{first: e.target.value}})} 
+                onChange={(e)=> setNewEmployee({...newEmployee, name:{...newEmployee.name, first: e.target.value}})} 
               />
             </label>
             <label>Last Name:
@@ -81,7 +148,7 @@ function App() {
                 type='text' 
                 placeholder='Last Name' 
                 value={newEmployee.name.last}
-                onChange={(e)=> setNewEmployee({...newEmployee, name:{last: e.target.value}})} 
+                onChange={(e)=> setNewEmployee({...newEmployee, name:{...newEmployee.name, last: e.target.value}})} 
               />
             </label>
             <label>City:
@@ -121,9 +188,10 @@ function App() {
                 type='text' 
                 placeholder='3 Favorite Movies' 
                 value={newEmployee.favoriteMovies}
-                onChange={(e)=> setNewEmployee({...newEmployee, favoriteMovies: e.target.value})}
+                onChange={(e)=> setNewEmployee({...newEmployee, favoriteMovies: e.target.value.split(',')})}
               />
             </label>
+            <p>*Separate movies with commas*</p>
             <button type='submit'>Add Employee</button>
           </form>
         </div>
